@@ -14,7 +14,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="login">
+    <div className="auth_form">
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>
@@ -40,7 +40,7 @@ const Login: React.FC = () => {
           />
         </Form.Group>
 
-        <div className="buttons">
+        <div className="auth_buttons">
           <Button variant="primary" type="submit">
             Login
           </Button>
