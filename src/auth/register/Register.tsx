@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
-import "./register.css";
 
 interface RegistrationForm {
   name: string;
@@ -50,7 +49,7 @@ const Registration: React.FC = () => {
   };
 
   return (
-    <div className="auth_form">
+    <div className="bg-primary position-absolute top-50 start-50 translate-middle p-3 rounded-3">
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3" controlId="formBasicName">
           <Form.Label>Name</Form.Label>
@@ -104,11 +103,11 @@ const Registration: React.FC = () => {
           />
         </Form.Group>
 
-        <div className="auth_buttons">
-          <Button variant="primary" type="submit">
+        <div className="d-flex justify-content-between mt-4">
+          <Button variant="outline-light" type="submit">
             Register
           </Button>
-          <Button variant="secondary">Login</Button>
+          <Button variant="outline-light">Login</Button>
         </div>
       </Form>
     </div>
