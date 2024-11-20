@@ -16,7 +16,7 @@ const Controllers = ({
   onFilterChange,
 }: ControllersProps) => {
   return (
-    <div className="d-flex">
+    <div className="d-flex pb-3">
       <div className="d-flex align-items-cente">
         <Button variant="outline-primary" onClick={onBlock}>
           <FaUserSlash /> Block

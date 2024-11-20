@@ -1,7 +1,10 @@
 export interface User {
-  id: number;
-  name: string;
   email: string;
-  lastSeen: string;
+  id: number;
+  last_login: Date;
+  name: string;
+  password: string;
+  registration_time: string;
   status: "active" | "blocked";
+  work: string;
 }
