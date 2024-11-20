@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import supabase from "../../config/supabase";
+import DismissibleAlert from "../../utils/Alert";
 
 interface RegistrationForm {
   name: string;
@@ -15,6 +17,8 @@ const Registration: React.FC = () => {
     work: "",
     password: "",
   });
+  const [show, setShow] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -26,30 +30,26 @@ const Registration: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      // TODO: replace with actual api
-      const response = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      if (response.ok) {
-        console.log("Registration successful!");
-        // Redirect to login page
-      } else {
-        console.error("Registration failed");
-        // Display error message to the user
+      const { error } = await supabase.from("users").insert(formData);
+      if (error) {
+        setErrorMessage(error.details);
+        setShow(true);
       }
     } catch (error) {
       console.error("Error during registration:", error);
-      // Display error message to the user
     }
   };
 
   return (
     <div className="bg-primary position-absolute top-50 start-50 translate-middle p-3 rounded-3">
+      {show && (
+        <DismissibleAlert
+          text={errorMessage}
+          heading="Error!"
+          color="danger"
+          setShow={setShow}
+        />
+      )}
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3" controlId="formBasicName">
           <Form.Label>Name</Form.Label>

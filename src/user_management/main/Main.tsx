@@ -3,42 +3,46 @@ import { Table, Container, Row, Col, Form } from "react-bootstrap";
 import Controllers from "../controllers/Controllers";
 import UserPanel from "../user/User";
 import { User } from "../../types/Interfaces";
+import supabase from "../../config/supabase";
+import DismissibleAlert from "../../utils/Alert";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [filter, setFilter] = useState("");
+  const [show, setShow] = useState(false);
 
   useEffect(() => {
-    const mockUsers: User[] = [
-      {
-        id: 1,
-        name: "John Doe",
-        email: "johndoe@example.com",
-        lastSeen: "2023-11-19",
-        status: "active",
-      },
-      {
-        id: 2,
-        name: "Jane Smith",
-        email: "janesmith@example.com",
-        lastSeen: "2023-11-18",
-        status: "blocked",
-      },
-    ];
-    setUsers(mockUsers);
-  }, []);
+    getUsers();
+  }, [users]);
 
-  const handleDelete = () => {
-    // Implement deletion logic using selectedUsers
+  async function getUsers() {
+    const { data } = await supabase
+      .from("users")
+      .select()
+      .order("last_login", { ascending: false });
+    data && setUsers(data);
+  }
+
+  const handleDelete = async () => {
+    await supabase.from("users").delete().in("id", selectedUsers);
+    setShow(true);
   };
 
-  const handleBlock = () => {
-    // Implement blocking logic using selectedUsers
+  const handleBlock = async () => {
+    const { error } = await supabase
+      .from("users")
+      .update({ status: "blocked" })
+      .in("id", selectedUsers);
+    error && console.error(error);
   };
 
-  const handleUnblock = () => {
-    // Implement unblocking logic using selectedUsers
+  const handleUnblock = async () => {
+    const { error } = await supabase
+      .from("users")
+      .update({ status: "active" })
+      .in("id", selectedUsers);
+    error && console.error(error);
   };
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,6 +73,14 @@ const UserManagement = () => {
     <Container className="position-absolute top-50 start-50 translate-middle p-3 rounded-3">
       <Row>
         <Col>
+          {show && (
+            <DismissibleAlert
+              text="User successfully Deleted!"
+              heading="Success!"
+              setShow={setShow}
+              color="success"
+            />
+          )}
           <Controllers
             onDelete={handleDelete}
             onBlock={handleBlock}
@@ -98,6 +110,7 @@ const UserManagement = () => {
             <tbody>
               {filteredUsers.map((user) => (
                 <UserPanel
+                  key={user.id}
                   user={user}
                   selectedUsers={selectedUsers}
                   handleCheckboxChange={handleCheckboxChange}

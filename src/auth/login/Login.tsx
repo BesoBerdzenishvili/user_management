@@ -1,19 +1,43 @@
 import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
+import supabase from "../../config/supabase";
+import DismissibleAlert from "../../utils/Alert";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // TODO: send request to server
-    console.log(email, password);
+    const { data, error } = await supabase.from("users").select();
+    const thisUser = data && data.filter((i) => i.email === email);
+    if (!thisUser?.length || thisUser[0].password !== password) {
+      setErrorMessage("Incorrect Email or Password!");
+      setShow(true);
+      return;
+    }
+    // TODO: make currentUser thisUser
+    console.log(thisUser);
+    if (error) {
+      console.error(error);
+      setErrorMessage(error.details);
+      setShow(true);
+    }
   };
 
   return (
     <div className="bg-primary position-absolute top-50 start-50 translate-middle p-3 rounded-3">
+      {show && (
+        <DismissibleAlert
+          text={errorMessage}
+          heading="Error!"
+          color="danger"
+          setShow={setShow}
+        />
+      )}
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
           <Form.Label>Email address</Form.Label>

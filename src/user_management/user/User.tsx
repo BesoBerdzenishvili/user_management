@@ -14,6 +14,8 @@ const UserPanel: React.FC<UserPanel> = ({
   handleCheckboxChange,
 }) => {
   const disable = user.status === "blocked" ? "secondary" : "primary";
+  let lastLogin = user.last_login.toString();
+  const lastSeen = `${lastLogin.slice(0, 10)} - ${lastLogin.slice(11, 16)}`;
   return (
     <tr
       style={{
@@ -30,8 +32,8 @@ const UserPanel: React.FC<UserPanel> = ({
       </td>
       <td className={`bg-${disable}`}>{user.name}</td>
       <td className={`bg-${disable}`}>{user.email}</td>
-      <td className={`bg-${disable}`} title={user.lastSeen}>
-        {user.lastSeen.split("T")[0]}
+      <td className={`bg-${disable}`} title={lastSeen}>
+        {lastSeen.substring(13, 18)}
       </td>
     </tr>
   );
