@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import supabase from "../../config/supabase";
 import DismissibleAlert from "../../utils/Alert";
+import { Link, useNavigate } from "react-router-dom";
 
 interface RegistrationForm {
   name: string;
@@ -20,6 +21,8 @@ const Registration: React.FC = () => {
   const [show, setShow] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
+  const navigate = useNavigate();
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
@@ -35,11 +38,11 @@ const Registration: React.FC = () => {
         setErrorMessage(error.details);
         setShow(true);
       }
+      !error && navigate("/");
     } catch (error) {
       console.error("Error during registration:", error);
     }
   };
-
   return (
     <div className="bg-primary position-absolute top-50 start-50 translate-middle p-3 rounded-3">
       {show && (
@@ -107,7 +110,9 @@ const Registration: React.FC = () => {
           <Button variant="outline-light" type="submit">
             Register
           </Button>
-          <Button variant="outline-light">Login</Button>
+          <Link to="/login">
+            <Button variant="outline-light">Login</Button>
+          </Link>
         </div>
       </Form>
     </div>

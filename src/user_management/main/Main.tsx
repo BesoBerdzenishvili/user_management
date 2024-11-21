@@ -5,12 +5,17 @@ import UserPanel from "../user/User";
 import { User } from "../../types/Interfaces";
 import supabase from "../../config/supabase";
 import DismissibleAlert from "../../utils/Alert";
+import { Logout } from "../../auth/Logout";
+import { useAuth } from "../../hooks/useAuth";
 
 const UserManagement = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [filter, setFilter] = useState("");
   const [show, setShow] = useState(false);
+
+  const { user, checkUser } = useAuth();
+  const currentUser = users.filter((i) => i.name === user)[0];
 
   useEffect(() => {
     getUsers();
@@ -25,24 +30,30 @@ const UserManagement = () => {
   }
 
   const handleDelete = async () => {
-    await supabase.from("users").delete().in("id", selectedUsers);
-    setShow(true);
+    if (checkUser(currentUser)) {
+      await supabase.from("users").delete().in("id", selectedUsers);
+      setShow(true);
+    }
   };
 
   const handleBlock = async () => {
-    const { error } = await supabase
-      .from("users")
-      .update({ status: "blocked" })
-      .in("id", selectedUsers);
-    error && console.error(error);
+    if (checkUser(currentUser)) {
+      const { error } = await supabase
+        .from("users")
+        .update({ status: "blocked" })
+        .in("id", selectedUsers);
+      error && console.error(error);
+    }
   };
 
   const handleUnblock = async () => {
-    const { error } = await supabase
-      .from("users")
-      .update({ status: "active" })
-      .in("id", selectedUsers);
-    error && console.error(error);
+    if (checkUser(currentUser)) {
+      const { error } = await supabase
+        .from("users")
+        .update({ status: "active" })
+        .in("id", selectedUsers);
+      error && console.error(error);
+    }
   };
 
   const handleFilterChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,57 +81,59 @@ const UserManagement = () => {
   );
 
   return (
-    <Container className="position-absolute top-50 start-50 translate-middle p-3 rounded-3">
-      <Row>
-        <Col>
-          {show && (
-            <DismissibleAlert
-              text="User successfully Deleted!"
-              heading="Success!"
-              setShow={setShow}
-              color="success"
+    <>
+      <Logout />
+      <Container className="position-absolute top-50 start-50 translate-middle p-3 rounded-3">
+        <Row>
+          <Col>
+            {show && (
+              <DismissibleAlert
+                text="User successfully Deleted!"
+                heading="Success!"
+                setShow={setShow}
+                color="success"
+              />
+            )}
+            <Controllers
+              onDelete={handleDelete}
+              onBlock={handleBlock}
+              onUnblock={handleUnblock}
+              onFilterChange={handleFilterChange}
             />
-          )}
-          <Controllers
-            onDelete={handleDelete}
-            onBlock={handleBlock}
-            onUnblock={handleUnblock}
-            onFilterChange={handleFilterChange}
-          />
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th className="bg-danger">
-                  <Form.Check
-                    type="checkbox"
-                    className="form-check-label-color-primary"
-                    onChange={handleSelectAll}
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th className="bg-danger">
+                    <Form.Check
+                      type="checkbox"
+                      className="form-check-label-color-primary"
+                      onChange={handleSelectAll}
+                    />
+                  </th>
+                  <th className="bg-danger">Name</th>
+                  <th className="bg-danger">Email</th>
+                  <th className="bg-danger">Last Seen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredUsers.map((user) => (
+                  <UserPanel
+                    key={user.id}
+                    user={user}
+                    selectedUsers={selectedUsers}
+                    handleCheckboxChange={handleCheckboxChange}
                   />
-                </th>
-                {/* TODO: replace with DB data headers if any */}
-                <th className="bg-danger">Name</th>
-                <th className="bg-danger">Email</th>
-                <th className="bg-danger">Last Seen</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredUsers.map((user) => (
-                <UserPanel
-                  key={user.id}
-                  user={user}
-                  selectedUsers={selectedUsers}
-                  handleCheckboxChange={handleCheckboxChange}
-                />
-              ))}
-            </tbody>
-          </Table>
-        </Col>
-      </Row>
-    </Container>
+                ))}
+              </tbody>
+            </Table>
+          </Col>
+        </Row>
+      </Container>
+    </>
   );
 };
 

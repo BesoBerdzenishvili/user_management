@@ -21,14 +21,13 @@ const Controllers = ({
         <Button variant="outline-primary" onClick={onBlock}>
           <FaUserSlash /> Block
         </Button>
-        <Button variant="outline-primary" onClick={onUnblock}>
-          <FaUserCheck /> Unblock
+        <Button variant="outline-primary" className="w-100" onClick={onUnblock}>
+          <FaUserCheck />
         </Button>
-        <Button variant="outline-danger" onClick={onDelete}>
-          <FaTrash /> Delete
+        <Button variant="outline-danger" className="w-100" onClick={onDelete}>
+          <FaTrash />
         </Button>
       </div>
-      {/* TODO: move this to the right */}
       <InputGroup>
         <FormControl placeholder="Filter..." onChange={onFilterChange} />
       </InputGroup>
