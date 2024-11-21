@@ -114,7 +114,6 @@ const UserManagement = () => {
                       onChange={handleSelectAll}
                     />
                   </th>
-                  {/* TODO: replace with DB data headers if any */}
                   <th className="bg-danger">Name</th>
                   <th className="bg-danger">Email</th>
                   <th className="bg-danger">Last Seen</th>
