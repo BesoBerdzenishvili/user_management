@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const checkUser = (user: User) => {
-    if (user.status === "blocked") {
+    if (!user || user.status === "blocked") {
       navigate("/login");
       logout();
       return false;
