@@ -2,12 +2,16 @@ import React, { useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import supabase from "../../config/supabase";
 import DismissibleAlert from "../../utils/Alert";
+import { useAuth } from "../../hooks/useAuth";
+import { Link } from "react-router-dom";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [show, setShow] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const { login } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -19,12 +23,24 @@ const Login: React.FC = () => {
       setShow(true);
       return;
     }
-    // TODO: make currentUser thisUser
-    console.log(thisUser);
+    if (thisUser[0].status === "blocked") {
+      setErrorMessage("User is blocked!");
+      setShow(true);
+      return;
+    }
     if (error) {
       console.error(error);
       setErrorMessage(error.details);
       setShow(true);
+    }
+    if (thisUser) {
+      await login(thisUser[0]?.name);
+
+      const { error } = await supabase
+        .from("users")
+        .update({ last_login: new Date() })
+        .in("id", thisUser[0].id.toString());
+      console.log(error);
     }
   };
 
@@ -67,8 +83,9 @@ const Login: React.FC = () => {
           <Button variant="outline-light" type="submit">
             Login
           </Button>
-          {/* TODO: add Link for react router here for redirecting to '/register' */}
-          <Button variant="outline-light">Register</Button>
+          <Link to="/registration">
+            <Button variant="outline-light">Register</Button>
+          </Link>
         </div>
       </Form>
     </div>
